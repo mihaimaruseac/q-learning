@@ -5,6 +5,7 @@
 #
 
 import gtk
+import glib
 
 TITLE = "Robot in a Grid"
 
@@ -29,6 +30,12 @@ class MainWindow(gtk.Window):
 
         self.show()
         self.show_all()
+
+        # Is the simulation in Play mode?
+        self._running = False
+        # Inhibit the last signal sent (used to disable a last callback after
+        # Pause was clicked).
+        self._inhibit = False
 
     def _build_gui(self):
         """
@@ -72,6 +79,8 @@ class MainWindow(gtk.Window):
         label       label of button
         tooltip     tooltip for the button
         callback    callback when button is clicked
+
+        return      the button
         """
         img = gtk.Image()
         img.set_from_stock(img_stock, gtk.ICON_SIZE_LARGE_TOOLBAR)
@@ -85,16 +94,24 @@ class MainWindow(gtk.Window):
         """
         Used to switch the type of play/pause button.
         """
-        s = self._btnPlayPause.get_label()
-        if s == 'Play':
+        if self._running:
             label = 'Pause'
             img_stock = gtk.STOCK_MEDIA_PAUSE
-        elif s == 'Pause':
+        else:
             label = 'Play'
             img_stock = gtk.STOCK_MEDIA_PLAY
         self._btnPlayPause.get_icon_widget().set_from_stock(img_stock,
                 gtk.ICON_SIZE_LARGE_TOOLBAR)
         self._btnPlayPause.set_label(label)
+
+    def _switch_playstep_buttons(self, state):
+        """
+        Used to enable or disable the animation buttons.
+
+        state   sensitive status of the buttons (True if enabled)
+        """
+        self._btnStep.set_sensitive(state)
+        self._btnPlayPause.set_sensitive(state)
 
     def __on_exit(self, widget, data=None):
         """
@@ -108,19 +125,59 @@ class MainWindow(gtk.Window):
         Called when the user issues a request for a new game.
         """
         print "New Game"
+        if self._running:
+            self._running = False
+            self._inhibit = True
+            self._switch_play_button_type()
+#TODO: show config dialog
+        self._switch_playstep_buttons(True)
+
+    def __step(self):
+        """
+        Callback function used to generate one more step from the simulation.
+
+        This is called exactly once by Step button's callback and as long as
+        it is needed as a timer callback set from the Play button's callback.
+        Because user might have pressed Pause before running this function, it
+        has to check if the simulation is still running and return the valid
+        response.
+
+        If the simulation is ended, return False after disabling the
+        simulation's buttons.
+
+        return True if this functions should be called at a later time.
+        """
+        if self._inhibit:
+            self._inhibit = False
+            # do nothing, stop callbacks
+            return False
+#TODO: actual invocation
+        print "Called"
+        if False:
+            # simulation ended, expect new start
+            self._switch_playstep_buttons(False)
+            return False
+        return self._running
 
     def __on_step(self, widget, data=None):
         """
         Called when the user clicks the Step button.
         """
-        print "Step"
+        self.__step()
 
     def __on_play(self, widget, data=None):
         """
         Called when the user clicks the Play/Pause button.
         """
-        print "Play"
+        self._running = not self._running
         self._switch_play_button_type()
+        if self._running:
+            self._btnStep.set_sensitive(False)
+            glib.timeout_add_seconds(1, self.__step)
+            self.__step()
+        else:
+            self._inhibit = True
+            self._btnStep.set_sensitive(True)
 
     def __on_about(self, widget, data=None):
         """
