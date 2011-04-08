@@ -37,6 +37,10 @@ class MainWindow(gtk.Window):
         # Pause was clicked).
         self._inhibit = False
 
+        # No world is built now, it will be built after the config is
+        # displayed.
+        self._world = None
+
     def _build_gui(self):
         """
         Builds the interface of this window, the entire tree of widgets.
