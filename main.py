@@ -7,6 +7,8 @@
 import gtk
 import glib
 
+import config
+
 TITLE = "Robot in a Grid"
 
 class MainWindow(gtk.Window):
@@ -49,6 +51,7 @@ class MainWindow(gtk.Window):
         self.add(self._vbox)
 
         self._build_toolbar()
+        self._vbox.pack_start(self._toolbar, False, False, 5)
 
     def _build_toolbar(self):
         """
@@ -59,7 +62,6 @@ class MainWindow(gtk.Window):
         self._toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
         self._toolbar.set_style(gtk.TOOLBAR_BOTH)
         self._toolbar.set_border_width(5)
-        self._vbox.pack_start(self._toolbar, False, False, 5)
 
         self._btnNew = self._add_button_to_toolbar(gtk.STOCK_NEW, "New",
                 "Starts a new simulation", self.__on_new_game)
@@ -128,12 +130,14 @@ class MainWindow(gtk.Window):
         """
         Called when the user issues a request for a new game.
         """
-        print "New Game"
         if self._running:
             self._running = False
             self._inhibit = True
             self._switch_play_button_type()
-#TODO: show config dialog
+        cfg = config.Config(self, TITLE)
+        cfg.display()
+        print cfg.get_settings()
+        cfg.destroy()
         self._switch_playstep_buttons(True)
 
     def __step(self):
