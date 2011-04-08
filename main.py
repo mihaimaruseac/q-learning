@@ -126,7 +126,24 @@ class MainWindow(gtk.Window):
         """
         Called when the user issues a request for the About dialog.
         """
-        print "About"
+        aboutDialog = gtk.AboutDialog()
+        aboutDialog.set_name(TITLE)
+        aboutDialog.set_authors(["Mihai Maruseac <mihai.maruseac@rosedu.org>"])
+        aboutDialog.set_documenters(
+                ["Mihai Maruseac <mihai.maruseac@rosedu.org>"])
+        aboutDialog.set_artists(
+                ["Art taken from Public Domain pictures on the web"])
+        aboutDialog.set_comments(
+            "Simulate a robot trapped in a grid.\nThe robot must learn to stay "
+            "within a certain corridor in the grid.\nSee README and LICENSE "
+            "for more information.")
+        aboutDialog.set_copyright(
+            "Copyright © 2011 - 2012 Mihai Maruseac <mihai.maruseac@rosedu.org>")
+        aboutDialog.set_logo(self.get_icon())
+        aboutDialog.set_icon(self.get_icon())
+        aboutDialog.set_version("0.1")
+        aboutDialog.run()
+        aboutDialog.destroy()
 
 def main():
     """
