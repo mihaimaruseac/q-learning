@@ -11,6 +11,46 @@ import config
 
 TITLE = "Robot in a Grid"
 
+N = 12
+M = 8
+
+VOID = 42
+VOID_FILE = "void.png"
+EMPTY = 43
+EMPTY_FILE = "empty.png"
+ROBOT = 0
+ROBOT_FILE = "robot.png"
+ROBOT_N = 1
+ROBOT_N_FILE = "robot_n.png"
+ROBOT_E = 2
+ROBOT_E_FILE = "robot_e.png"
+ROBOT_S = 3
+ROBOT_S_FILE = "robot_s.png"
+ROBOT_W = 4
+ROBOT_W_FILE = "robot_w.png"
+
+IMAGES = {}
+
+def initImages():
+    """
+    Init's the images.
+    """
+    i = gtk.Image()
+    i.set_from_file(VOID_FILE)
+    IMAGES[VOID] = i.get_pixbuf()
+    i.set_from_file(EMPTY_FILE)
+    IMAGES[EMPTY] = i.get_pixbuf()
+    i.set_from_file(ROBOT_FILE)
+    IMAGES[ROBOT] = i.get_pixbuf()
+    i.set_from_file(ROBOT_N_FILE)
+    IMAGES[ROBOT_N] = i.get_pixbuf()
+    i.set_from_file(ROBOT_E_FILE)
+    IMAGES[ROBOT_E] = i.get_pixbuf()
+    i.set_from_file(ROBOT_S_FILE)
+    IMAGES[ROBOT_S] = i.get_pixbuf()
+    i.set_from_file(ROBOT_W_FILE)
+    IMAGES[ROBOT_W] = i.get_pixbuf()
+
 class MainWindow(gtk.Window):
     """
     Holds the definition for the main window from the GUI and all data
@@ -29,19 +69,49 @@ class MainWindow(gtk.Window):
         self.set_icon_from_file('robot.png')
         self.connect('delete_event', self.__on_exit)
 
+        self._build_world()
         self._build_gui()
+        self._paint_world()
         self.show()
         self.show_all()
 
+    def _paint_world(self):
+        """
+        Paint the world known at this moment of time.
+        """
+        for i in range(N):
+            for j in range(M):
+                self._imgs[i][j].set_from_pixbuf(IMAGES[self._iworld[i][j]])
+
+    def _build_world(self):
+        """
+        Builds the world in which the simulation takes place. Also, sets up
+        several simulation variables (see below for each comment).
+        """
         # Is the simulation in Play mode?
         self._running = False
         # Inhibit the last signal sent (used to disable a last callback after
         # Pause was clicked).
         self._inhibit = False
+        # The world
+        self._iworld = []
+        self._imgs = []
+        for i in range(N):
+            l = []
+            limg = []
+            for j in range(M):
+                l.append(VOID)
+                limg.append(gtk.Image())
+            self._iworld.append(l)
+            self._imgs.append(limg)
 
-        # No world is built now, it will be built after the config is
-        # displayed.
-        self._world = None
+        self._iworld[3][4] = EMPTY
+        self._iworld[4][2] = ROBOT
+        self._iworld[4][1] = ROBOT_N
+        self._iworld[5][2] = ROBOT_E
+        self._iworld[4][3] = ROBOT_S
+        self._iworld[3][2] = ROBOT_W
+        self._iworld[4][4] = EMPTY
 
     def _build_gui(self):
         """
@@ -52,6 +122,24 @@ class MainWindow(gtk.Window):
 
         _toolbar = self._build_toolbar()
         _vbox.pack_start(_toolbar, False, False, 5)
+        self._build_drawing_area(_vbox)
+
+    def _build_drawing_area(self, _vbox):
+        """
+        Builds the drawing area: a table containing images for representing
+        the maze.
+
+        _vbox   parent containing the drawng area
+        """
+        _h = gtk.HBox()
+        t = gtk.Table(N, M)
+        for i in range(N):
+            for j in range(M):
+                t.attach(self._imgs[i][j], i, i+1, j, j+1)
+        t.set_row_spacings(0)
+        t.set_col_spacings(0)
+        _h.pack_start(t, False, False, 10)
+        _vbox.pack_start(_h, False, False, 5)
 
     def _build_toolbar(self):
         """
@@ -228,6 +316,7 @@ def main():
     """
     Main function. Construct the windows and start all application threads.
     """
+    initImages()
     w = MainWindow()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
