@@ -69,8 +69,8 @@ class World(object):
         """
         xs = max(filter(lambda x: x <= self._xr, NPOINTS))
         ys = max(filter(lambda y: y <= self._yr, MPOINTS))
-        for i in range(N):
-            for j in range(M):
+        for i in xrange(N):
+            for j in xrange(M):
                 iw[i][j] = self._at(i + xs, j + ys)
 
     def _at(self, x, y):
@@ -130,7 +130,7 @@ class World(object):
         state = [x, y, self._N - x - 1, self._M - y - 1]
         print 'Real distances: {0}'.format(state)
         # trim to range
-        for i in range(len(state)):
+        for i in xrange(len(state)):
             if state[i] > self._D:
                 state[i] = self._D
         print 'Trimmed distances: {0}'.format(state)

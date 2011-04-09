@@ -63,8 +63,8 @@ class MainWindow(gtk.Window):
         if self._world:
             self._world.fill(self._iworld)
 
-        for i in range(N):
-            for j in range(M):
+        for i in xrange(N):
+            for j in xrange(M):
                 self._imgs[i][j].set_from_pixbuf(IMAGES[self._iworld[i][j]])
 
     def _build_world(self):
@@ -81,10 +81,10 @@ class MainWindow(gtk.Window):
         self._world = None
         self._iworld = []
         self._imgs = []
-        for i in range(N):
+        for i in xrange(N):
             l = []
             limg = []
-            for j in range(M):
+            for j in xrange(M):
                 l.append(VOID)
                 limg.append(gtk.Image())
             self._iworld.append(l)
@@ -110,8 +110,8 @@ class MainWindow(gtk.Window):
         """
         _h = gtk.HBox()
         t = gtk.Table(N, M)
-        for i in range(N):
-            for j in range(M):
+        for i in xrange(N):
+            for j in xrange(M):
                 t.attach(self._imgs[i][j], i, i+1, j, j+1)
         t.set_row_spacings(0)
         t.set_col_spacings(0)

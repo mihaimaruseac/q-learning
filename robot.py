@@ -30,6 +30,9 @@ class Robot(object):
         Does a single step (takes an action).
         """
         # Chose action from state
+        if self._Q.has_key(state):
+            act = self._Q[state]
+            return act[0]
         return FORWARD
 
     def receive_reward_and_state(self, olds, news, r):
