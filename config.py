@@ -103,8 +103,8 @@ class Config(object):
         _sarsa = gtk.RadioButton(self._ql, 'Use SARSA')
         _lmVBox.add(_sarsa)
 
-        self._aCounter = self._build_counter('α value:', 0, 1, _lmVBox)
-        self._gCounter = self._build_counter('γ value:', 0, 1, _lmVBox)
+        self._aCounter = self._build_counter('α value:', 0.1, 1, _lmVBox)
+        self._gCounter = self._build_counter('γ value:', 0.1, 1, _lmVBox)
 
     def _build_counter(self, text, minv, maxv, parent, incr=.05, digits=2, enabled=True):
         """

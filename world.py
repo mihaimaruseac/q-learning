@@ -106,15 +106,15 @@ class World(object):
                 if self._yr >= self._M:
                     self._yr = self._M - 1
             else:
-                self._xr += self._ror - 3
+                self._xr -= self._ror - 3
                 if self._xr < 0:
                     self._xr = 0
                 if self._xr >= self._N:
                     self._xr = self._N - 1
         elif act == TURN_LEFT:
-            self._ror = 1 + self._ror % ROBOT_E
-        elif act == TURN_RIGTH:
-            self._ror = 1 + (self._ror - 2)% ROBOT_E
+            self._ror = 1 + self._ror % ROBOT_W
+        elif act == TURN_RIGHT:
+            self._ror = 1 + (self._ror - 2)% ROBOT_W
 
         newstate = self._get_state()
         reward = self._get_reward(newstate)
@@ -126,14 +126,17 @@ class World(object):
         """
         x, y, o = self._xr, self._yr, self._ror
         # assume that o = ROBOT_N (that is we are facing north)
-        # compute the real distances
-        state = [x, y, self._N - x - 1, self._M - y - 1]
+        # compute the real distances (NESW)
+        state = [y, self._N - x - 1, self._M - y - 1, x]
+#        print "Real distances: {0}".format(state)
         # trim to range
         for i in xrange(len(state)):
             if state[i] > self._D:
                 state[i] = self._D
+#        print 'Trimmed distances: {0}'.format(state)
         # rotate state
         state = state[(o-1):] + state[:(o-1)]
+#        print 'state ({1}): {0}'.format(state, o)
 #        state.append(o)
         return tuple(state)
 
@@ -142,42 +145,20 @@ class World(object):
         Returns the reward for a given state.
         """
         a = -10 # small negative value to discourage turnings
-
         # Penalty for being able to leave the grid
-        p = -1000
-        if state[FRONT] == 0:
-            print 'able to leave'
-            a += p
-
+        a += -1000 if state[FRONT] == 0 else 0
         # Penalty for being between the min value and the borders
-        p = -5000
-        if state[RIGHT] < self._d1:
-            print 'too close'
-            a += p
-
+        a += -500 if state[RIGHT] < self._d1 else 0
         # Penalty for being above the max value (toward the center of grid)
-        p = -5000
-        if state[RIGHT] > self._d2:
-            print 'too far'
-            a += p
-
+        a += -50 if state[RIGHT] > self._d2 else 0
         # Bonus for being in the correct corridor
-        p = 100
-        if self._d1 <= state[RIGHT] <= self._d2:
-            print 'ok'
-            a += p
-
+        a += 100 if self._d1 <= state[RIGHT] <= self._d2 else 0
         # Penalty for having a wrong orientation
         p = -100
-        if state[RIGHT] > state[FRONT]:
-            print 'turn'
-            a += p
-        if state[RIGHT] > state[FRONT]:
-            print 'turn'
-            a += p
-        if state[RIGHT] > state[FRONT]:
-            print 'turn'
-            a += p
-
+        a += p if state[RIGHT] > state[FRONT] else 0
+        a += p if state[RIGHT] > state[BACK] else 0
+        a += p if state[RIGHT] > state[LEFT] else 0
+        # Small bonus for turning at the right spot
+        a += 10 if state[FRONT] > state[BACK] else 0
         return a
 
