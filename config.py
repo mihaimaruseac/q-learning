@@ -58,13 +58,7 @@ class Config(object):
         _fileHBox.pack_start(_fileLabel, False, False, 5)
         self._fileChoose = gtk.FileChooserButton("Select input filename")
         _fileHBox.pack_start(self._fileChoose, True, True, 5)
-        _rLabel = gtk.Label('Max steps:')
-        _fileHBox.pack_start(_rLabel, False, False, 5)
-        self._rCounter = gtk.SpinButton(gtk.Adjustment(step_incr=100))
-        self._rCounter.set_numeric(True)
-        self._rCounter.set_wrap(True)
-        self._rCounter.set_range(100, 10000)
-        _fileHBox.pack_start(self._rCounter, True, True, 5)
+        self._rCounter = self._build_counter('Max steps:', 100, 10000, _fileHBox, 100, 0)
 
     def _build_action_gui(self, _checkHBox):
         """
@@ -77,38 +71,18 @@ class Config(object):
         """
         _frameActionSelection = gtk.Frame('Action Selection')
         _checkHBox.pack_start(_frameActionSelection, True, True, 5)
-
         _asVBox = gtk.VBox()
         _frameActionSelection.add(_asVBox)
 
         self._greedyAction = gtk.RadioButton(None, 'Use ε-greedy selection')
         self._greedyAction.connect('clicked', self.__on_greedy)
         _asVBox.add(self._greedyAction)
-
-        _eHBox = gtk.HBox()
-        _eLabel = gtk.Label('ε value:')
-        _eHBox.pack_start(_eLabel, False, False, 5)
-        self._eCounter = gtk.SpinButton(gtk.Adjustment(step_incr=.05), digits=2)
-        self._eCounter.set_numeric(True)
-        self._eCounter.set_wrap(True)
-        self._eCounter.set_range(.1, .9)
-        _eHBox.pack_start(self._eCounter, True, True, 5)
-        _asVBox.add(_eHBox)
+        self._eCounter = self._build_counter('ε value:', .1, .9, _asVBox)
 
         _softmaxAction = gtk.RadioButton(self._greedyAction, 'Use softmax selection')
         _softmaxAction.connect('clicked', self.__on_softmax)
         _asVBox.add(_softmaxAction)
-
-        _tHBox = gtk.HBox()
-        _tLabel = gtk.Label('τ value:')
-        _tHBox.pack_start(_tLabel, False, False, 5)
-        self._tCounter = gtk.SpinButton(gtk.Adjustment(step_incr=.1), digits=1)
-        self._tCounter.set_numeric(True)
-        self._tCounter.set_wrap(True)
-        self._tCounter.set_range(1, 10)
-        self._tCounter.set_sensitive(False)
-        _tHBox.pack_start(self._tCounter, True, True, 5)
-        _asVBox.add(_tHBox)
+        self._tCounter = self._build_counter('τ value:', 1, 10, _asVBox, .1, 1, False)
 
     def _build_learning_gui(self, _checkHBox):
         """
@@ -128,25 +102,34 @@ class Config(object):
         _sarsa = gtk.RadioButton(self._ql, 'Use SARSA')
         _lmVBox.add(_sarsa)
 
-        _aHBox = gtk.HBox()
-        _aLabel = gtk.Label('α value:')
-        _aHBox.pack_start(_aLabel, False, False, 5)
-        self._aCounter = gtk.SpinButton(gtk.Adjustment(step_incr=.05), digits=2)
-        self._aCounter.set_numeric(True)
-        self._aCounter.set_wrap(True)
-        self._aCounter.set_range(0, 1)
-        _aHBox.pack_start(self._aCounter, True, True, 5)
-        _lmVBox.add(_aHBox)
+        self._aCounter = self._build_counter('α value:', 0, 1, _lmVBox)
+        self._gCounter = self._build_counter('γ value:', 0, 1, _lmVBox)
 
-        _gHBox = gtk.HBox()
-        _gLabel = gtk.Label('γ value:')
-        _gHBox.pack_start(_gLabel, False, False, 5)
-        self._gCounter = gtk.SpinButton(gtk.Adjustment(step_incr=.05), digits=2)
-        self._gCounter.set_numeric(True)
-        self._gCounter.set_wrap(True)
-        self._gCounter.set_range(0, 1)
-        _gHBox.pack_start(self._gCounter, True, True, 5)
-        _lmVBox.add(_gHBox)
+    def _build_counter(self, text, minv, maxv, parent, incr=.05, digits=2, enabled=True):
+        """
+        Builds a SpinButton used to represent a fixed value in a fixed
+        interval (for values of parameters).
+
+        text        text explaining what the value stands for
+        minv        minimal value for the counter
+        maxv        maximal value for the counter
+        parent      parent box for this counter
+        incr        increment value for the spin button
+        digits      decimal places to show in the button
+        enabled     is the SpinButton available when it is built?
+        return      the SpinButton built
+        """
+        _hBox = gtk.HBox()
+        _label = gtk.Label(text)
+        _hBox.pack_start(_label, False, False, 5)
+        sb = gtk.SpinButton(gtk.Adjustment(step_incr=incr), digits=digits)
+        sb.set_numeric(True)
+        sb.set_wrap(True)
+        sb.set_range(minv, maxv)
+        sb.set_sensitive(enabled)
+        _hBox.pack_start(sb, True, True, 5)
+        parent.add(_hBox)
+        return sb
 
     def display(self):
         """
