@@ -24,12 +24,12 @@ class MainWindow(gtk.Window):
         """
         super(MainWindow, self).__init__()
         self.set_size_request(800, 600)
+        self.set_resizable(False)
         self.set_title(TITLE)
         self.set_icon_from_file('robot.png')
         self.connect('delete_event', self.__on_exit)
 
         self._build_gui()
-
         self.show()
         self.show_all()
 

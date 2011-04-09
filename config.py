@@ -26,7 +26,8 @@ class Config(object):
         self._d = gtk.Dialog(title, parent,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, btn)
         self._d.set_deletable(False)
-        self._d.set_size_request(400, 220)
+        self._d.set_size_request(420, 220)
+        self._d.set_resizable(False)
         self._build_gui()
         self._d.show_all()
 
