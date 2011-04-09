@@ -22,7 +22,7 @@ class Robot(object):
         self._alpha = config['___α']
         self._gamma = config['___γ']
 
-    def step(self):
+    def step(self, state):
         """
         Does a single step (takes an action).
         """

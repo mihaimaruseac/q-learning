@@ -19,12 +19,12 @@ ROBOT = 0
 ROBOT_FILE = "robot.png"
 ROBOT_N = 1
 ROBOT_N_FILE = "robot_n.png"
-ROBOT_E = 2
-ROBOT_E_FILE = "robot_e.png"
+ROBOT_W = 2
+ROBOT_W_FILE = "robot_w.png"
 ROBOT_S = 3
 ROBOT_S_FILE = "robot_s.png"
-ROBOT_W = 4
-ROBOT_W_FILE = "robot_w.png"
+ROBOT_E = 4
+ROBOT_E_FILE = "robot_e.png"
 
 FORWARD = 42
 TURN_LEFT = 43

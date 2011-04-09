@@ -76,12 +76,10 @@ class World(object):
         """
         Returns what can be found at x, y
         """
+        if x < 0 or x >= self._N or y < 0 or y >= self._M:
+            return VOID
         if x == self._xr and y == self._yr:
             return self._ror
-        if x < 0 or x >= self._N:
-            return VOID
-        if y < 0 or y >= self._M:
-            return VOID
         return EMPTY
 
     def step(self):
@@ -89,37 +87,41 @@ class World(object):
         Does one step of evolution. Calls robot's next_step method, giving
         him the reward and the new state.
         """
-        act = self._robot.step()
+        state = self._get_state(self._xr, self._yr, self._ror)
+        act = self._robot.step(state)
         if act == FORWARD:
-            self._forward()
+            if self._ror % 2 == 1:
+                self._yr += self._ror - 2
+                if self._yr < 0:
+                    self._yr = 0
+                if self._yr >= self._M:
+                    self._yr = self._M - 1
+            else:
+                self._xr += self._ror - 3
+                if self._xr < 0:
+                    self._xr = 0
+                if self._xr >= self._N:
+                    self._xr = self._N - 1
         elif act == TURN_LEFT:
-            self._turn_left()
+            self._ror = 1 + self._ror % ROBOT_E
         elif act == TURN_RIGTH:
-            self._turn_right()
+            self._ror = 1 + (self._ror - 2)% ROBOT_E
 
-    def _forward(self):
+    def _get_state(self, x, y, o):
         """
-        Robot chose to go forward.
+        Returns the state for a specific position and orientation.
         """
-# TODO: check for validity
-        if self._ror == ROBOT_N:
-            self._yr -= 1
-        elif self._ror == ROBOT_E:
-            self._xr += 1
-        elif self._ror == ROBOT_S:
-            self._yr += 1
-        elif self._ror == ROBOT_W:
-            self._xr -= 1
-
-    def _turn_left(self):
-        """
-        Robot chose to turn left.
-        """
-        pass
-
-    def _turn_right(self):
-        """
-        Robot chose to turn right.
-        """
-        pass
+        # assume that o = ROBOT_N (that is we are facing north)
+        # compute the real distances
+        state = [x, y, self._N - x - 1, self._M - y - 1]
+        print 'Real distances: {0}'.format(state)
+        # trim to range
+        for i in range(len(state)):
+            if state[i] > self._D:
+                state[i] = self._D
+        print 'Trimmed distances: {0}'.format(state)
+        # rotate state
+        state = state[(o-1):] + state[:(o-1)]
+        print 'State: {0} ({1})'.format(state, o)
+        return tuple(state)
 
