@@ -30,6 +30,9 @@ class Config(object):
         self._build_gui()
         self._d.show_all()
 
+        # holds the settings (uses to be a dictionary if everything is ok)
+        self._configDict = None
+
     def _build_gui(self):
         """
         Builds the entire GUI for this dialog.
@@ -57,8 +60,15 @@ class Config(object):
         self._fileHBox.pack_start(self._fileLabel, False, False, 5)
         self._fileChoose = gtk.FileChooserButton("Select input filename")
         self._fileHBox.pack_start(self._fileChoose, True, True, 5)
-        self._btnPlots = gtk.CheckButton("Draw plots")
-        self._fileHBox.pack_start(self._btnPlots, False, False, 5)
+
+        self._rLabel = gtk.Label('Max steps:')
+        self._fileHBox.pack_start(self._rLabel, False, False, 5)
+        self._rCounter = gtk.SpinButton(gtk.Adjustment(step_incr=100))
+        self._rCounter.set_numeric(True)
+        self._rCounter.set_wrap(True)
+        self._rCounter.set_range(100, 10000)
+        self._fileHBox.pack_start(self._rCounter, True, True, 5)
+
         self._topVBox.pack_start(self._fileHBox, False, False, 5)
 
     def _build_action_gui(self):
@@ -84,7 +94,7 @@ class Config(object):
         self._eCounter = gtk.SpinButton(gtk.Adjustment(step_incr=.05), digits=2)
         self._eCounter.set_numeric(True)
         self._eCounter.set_wrap(True)
-        self._eCounter.set_range(0, 1)
+        self._eCounter.set_range(.1, .9)
         self._eHBox.pack_start(self._eCounter, True, True, 5)
         self._asVBox.add(self._eHBox)
 
@@ -99,7 +109,7 @@ class Config(object):
         self._tCounter = gtk.SpinButton(gtk.Adjustment(step_incr=.1), digits=1)
         self._tCounter.set_numeric(True)
         self._tCounter.set_wrap(True)
-        self._tCounter.set_range(0, 10)
+        self._tCounter.set_range(1, 10)
         self._tCounter.set_sensitive(False)
         self._tHBox.pack_start(self._tCounter, True, True, 5)
         self._asVBox.add(self._tHBox)
@@ -144,15 +154,37 @@ class Config(object):
 
     def display(self):
         """
-        Displays this dialog, letting the user to chose the options.
+        Displays this dialog, letting the user to chose the options. After the
+        dialog is closed, check the user inputs and construct the settings
+        dictionary.
         """
-        print self._d.run()
+        if self._d.run() == gtk.RESPONSE_REJECT:
+            self._configDict = None # nothing to return
+            return None
+        self._configDict = {}
+
+        # Try to read the file provided
+        if not self._read(self._fileChoose.get_filename()):
+            md = gtk.MessageDialog(self._d, gtk.DIALOG_DESTROY_WITH_PARENT,
+                    gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, "Invalid file!")
+            md.run()
+            md.destroy()
+            # Try again, hopefully we won't recourse too many times.
+            self.display()
+
+        # If everything is ok here, read info from the other widgets,
+        # complete the dictionary and return (the other widgets always
+        # return good values).
+        self._complete_config()
 
     def get_settings(self):
         """
         Returns the user's options. To be called only after hiding the dialog.
+        Simply returns the dictionary.
         """
-        pass
+        d = self._configDict
+        self._configDict = None
+        return d
 
     def destroy(self):
         """
@@ -161,6 +193,54 @@ class Config(object):
         result in bugs.
         """
         self._d.destroy()
+
+    def _read(self, fName):
+        """
+        Reads the user provided filename to obtain information about the
+        simulation. Completes the _configDict.
+
+        return  True if everything is ok
+        """
+        if not fName:
+            return False
+
+        try:
+            with open(fName) as f:
+                d = f.readline()
+                p = d.split()
+                if len(p) != 2:
+                    return False
+                self._configDict['N'] = int(p[0])
+                self._configDict['M'] = int(p[1])
+                d = f.readline()
+                self._configDict['D'] = int(d)
+                d = f.readline()
+                p = d.split()
+                if len(p) != 2:
+                    return False
+                self._configDict['xs'] = int(p[0])
+                self._configDict['ys'] = int(p[1])
+                d = f.readline()
+                self._configDict['d1'] = int(d)
+                d = f.readline()
+                self._configDict['d2'] = int(d)
+        except Exception as e:
+            return False
+        return True
+
+    def _complete_config(self):
+        """
+        Reads data from the dialog's widgets to complete the _configDict.
+        """
+        self._configDict['greedy?'] = b = self._greedyAction.get_active()
+        if b:
+            self._configDict['ε/τ'] = self._eCounter.get_value()
+        else:
+            self._configDict['ε/τ'] = self._tCounter.get_value()
+        self._configDict['Q?'] = self._ql.get_active()
+        self._configDict['α'] = self._aCounter.get_value()
+        self._configDict['γ'] = self._gCounter.get_value()
+        self._configDict['runs'] = self._rCounter.get_value()
 
     def __on_greedy(self, widget, data=None):
         """
