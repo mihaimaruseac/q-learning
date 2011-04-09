@@ -8,32 +8,13 @@ import gtk
 import glib
 
 import config
-
-TITLE = "Robot in a Grid"
-
-N = 12
-M = 8
-
-VOID = 42
-VOID_FILE = "void.png"
-EMPTY = 43
-EMPTY_FILE = "empty.png"
-ROBOT = 0
-ROBOT_FILE = "robot.png"
-ROBOT_N = 1
-ROBOT_N_FILE = "robot_n.png"
-ROBOT_E = 2
-ROBOT_E_FILE = "robot_e.png"
-ROBOT_S = 3
-ROBOT_S_FILE = "robot_s.png"
-ROBOT_W = 4
-ROBOT_W_FILE = "robot_w.png"
-
-IMAGES = {}
+import world
+from globaldefs import *
 
 def initImages():
     """
-    Init's the images.
+    Init's the images. It stays here instead of being placed in globaldefs.py
+    because it needs gtk imported.
     """
     i = gtk.Image()
     i.set_from_file(VOID_FILE)
@@ -79,6 +60,9 @@ class MainWindow(gtk.Window):
         """
         Paint the world known at this moment of time.
         """
+        if self._world:
+            self._world.fill(self._iworld)
+
         for i in range(N):
             for j in range(M):
                 self._imgs[i][j].set_from_pixbuf(IMAGES[self._iworld[i][j]])
@@ -94,6 +78,7 @@ class MainWindow(gtk.Window):
         # Pause was clicked).
         self._inhibit = False
         # The world
+        self._world = None
         self._iworld = []
         self._imgs = []
         for i in range(N):
@@ -104,14 +89,6 @@ class MainWindow(gtk.Window):
                 limg.append(gtk.Image())
             self._iworld.append(l)
             self._imgs.append(limg)
-
-        self._iworld[3][4] = EMPTY
-        self._iworld[4][2] = ROBOT
-        self._iworld[4][1] = ROBOT_N
-        self._iworld[5][2] = ROBOT_E
-        self._iworld[4][3] = ROBOT_S
-        self._iworld[3][2] = ROBOT_W
-        self._iworld[4][4] = EMPTY
 
     def _build_gui(self):
         """
@@ -245,6 +222,9 @@ class MainWindow(gtk.Window):
         r = cfg.get_settings()
         cfg.destroy()
         self._switch_playstep_buttons(r != None)
+        if r:
+            self._world = world.World(r)
+            self._paint_world()
 
     def __step(self):
         """
@@ -265,8 +245,9 @@ class MainWindow(gtk.Window):
             self._inhibit = False
             # do nothing, stop callbacks
             return False
-#TODO: actual invocation
-        print "Called"
+
+        self._world.step()
+        self._paint_world()
         return self._running
 
     def __on_step(self, widget, data=None):
