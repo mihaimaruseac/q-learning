@@ -10,6 +10,9 @@ from globaldefs import *
 class Robot(object):
     """
     A robot which should navigate in a world.
+
+    Simple workflow:
+        __init__ -> [a:] step -> receive_reward_and_state -> goto a
     """
 
     def __init__(self, config):
@@ -43,7 +46,6 @@ class Robot(object):
         else:
             self._Q[state] = {FORWARD:0, TURN_LEFT:0, TURN_RIGHT:0}
             a = random.choice(self._Q[state].keys())
-#        print 'From state {0}, chose {1}'.format(state, a)
         return a
 
     def receive_reward_and_state(self, olds, a, news, r):
@@ -56,8 +58,6 @@ class Robot(object):
         news    New state
         r       Reward given
         """
-#        print 'From state {0}, chose {1}, got to {2} with reward {3}'.\
-#            format(olds, a, news, r)
         if not self._Q.has_key(news):
             q = 0
         elif self._Q_or_SARSA:
@@ -69,7 +69,6 @@ class Robot(object):
             q = self._Q[news][self._choose_action(self._Q[news], True)]
         qa = self._Q[olds][a]
         self._Q[olds][a] += self._alpha * (r + self._gamma * q - qa)
-#        print 'Now Q is {0}'.format(self._Q)
 
     def _choose_action(self, actions, future=False):
         """

@@ -90,6 +90,8 @@ class World(object):
         Does one step of evolution. Calls robot's next_step method giving him
         the start state. After receiving robot's action, update state and send
         the newstate and reward to the robot.
+
+        return  a tuple (epoch ended, current total reward)
         """
         # update count of steps in this epoch
         self._crun += 1
@@ -97,7 +99,6 @@ class World(object):
             # reset state
             self._crun = 0
             self._xr, self._yr, self._ror = self._xs, self._ys, self._oror
-            print 'TT', self._rec
             self._rec = 0
 
         state = self._get_state()
@@ -126,6 +127,7 @@ class World(object):
         reward = self._get_reward(newstate)
         self._rec += reward
         self._robot.receive_reward_and_state(state, act, newstate, reward)
+        return (self._crun == 0, self._rec)
 
     def _get_state(self):
         """
@@ -135,16 +137,12 @@ class World(object):
         # assume that o = ROBOT_N (that is we are facing north)
         # compute the real distances (NESW)
         state = [y, self._N - x - 1, self._M - y - 1, x]
-#        print "Real distances: {0}".format(state)
         # trim to range
         for i in xrange(len(state)):
             if state[i] > self._D:
                 state[i] = self._D
-#        print 'Trimmed distances: {0}'.format(state)
         # rotate state
         state = state[(o-1):] + state[:(o-1)]
-#        print 'state ({1}): {0}'.format(state, o)
-#        state.append(o)
         return tuple(state)
 
     def _get_reward(self, state):
