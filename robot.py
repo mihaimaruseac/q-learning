@@ -18,13 +18,24 @@ class Robot(object):
         """
         self._greedy = config['greedy?']
         self._eps_or_tau = config['___ε/τ']
-        self._Q = config['Q?']
+        self._Q_or_SARSA = config['Q?']
         self._alpha = config['___α']
         self._gamma = config['___γ']
+
+        # state, action utility dictionary
+        self._Q = {}
 
     def step(self, state):
         """
         Does a single step (takes an action).
         """
+        # Chose action from state
         return FORWARD
+
+    def receive_reward_and_state(self, olds, news, r):
+        """
+        Receive a reward after taking an action from olds state, reaching news
+        state. Basically, learn (state,action) utilities.
+        """
+        pass
 

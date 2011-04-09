@@ -45,6 +45,7 @@ class World(object):
         self._d1 = config['d1']
         self._d2 = config['d2']
         self._runs = config['runs']
+        self._crun = 0
 
     def _build_robot(self, config):
         """
@@ -57,7 +58,7 @@ class World(object):
         d['___α'] = config['α']
         d['___γ'] = config['γ']
         self._robot = robot.Robot(d)
-        self._ror = ROBOT_S
+        self._ror = self._oror = ROBOT_S
 
     def fill(self, iw):
         """
@@ -84,10 +85,18 @@ class World(object):
 
     def step(self):
         """
-        Does one step of evolution. Calls robot's next_step method, giving
-        him the reward and the new state.
+        Does one step of evolution. Calls robot's next_step method giving him
+        the start state. After receiving robot's action, update state and send
+        the newstate and reward to the robot.
         """
-        state = self._get_state(self._xr, self._yr, self._ror)
+        # update count of steps in this epoch
+        self._crun += 1
+        if self._crun == self._runs:
+            # reset state
+            self._crun = 0
+            self._xr, self._yr, self._ror = self._xs, self._ys, self._oror
+
+        state = self._get_state()
         act = self._robot.step(state)
         if act == FORWARD:
             if self._ror % 2 == 1:
@@ -107,10 +116,15 @@ class World(object):
         elif act == TURN_RIGTH:
             self._ror = 1 + (self._ror - 2)% ROBOT_E
 
-    def _get_state(self, x, y, o):
+        newstate = self._get_state()
+        reward = self._get_reward(newstate)
+        self._robot.receive_reward_and_state(state, newstate, reward)
+
+    def _get_state(self):
         """
         Returns the state for a specific position and orientation.
         """
+        x, y, o = self._xr, self._yr, self._ror
         # assume that o = ROBOT_N (that is we are facing north)
         # compute the real distances
         state = [x, y, self._N - x - 1, self._M - y - 1]
@@ -122,6 +136,13 @@ class World(object):
         print 'Trimmed distances: {0}'.format(state)
         # rotate state
         state = state[(o-1):] + state[:(o-1)]
-        print 'State: {0} ({1})'.format(state, o)
+        state.append(o)
+        print 'State: {0}'.format(state)
         return tuple(state)
+
+    def _get_reward(self, state):
+        """
+        Returns the reward for a given state.
+        """
+        return -10
 
