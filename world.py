@@ -46,6 +46,8 @@ class World(object):
         self._d2 = config['d2']
         self._runs = config['runs']
         self._crun = 0
+        self._rec = 0
+        self._p = 0
 
     def _build_robot(self, config):
         """
@@ -95,10 +97,14 @@ class World(object):
             # reset state
             self._crun = 0
             self._xr, self._yr, self._ror = self._xs, self._ys, self._oror
+            print 'TT', self._rec
+            self._rec = 0
 
         state = self._get_state()
         act = self._robot.step(state)
+        self._p += 2 * self._p - 100
         if act == FORWARD:
+            self._p = 0
             if self._ror % 2 == 1:
                 self._yr += self._ror - 2
                 if self._yr < 0:
@@ -118,6 +124,7 @@ class World(object):
 
         newstate = self._get_state()
         reward = self._get_reward(newstate)
+        self._rec += reward
         self._robot.receive_reward_and_state(state, act, newstate, reward)
 
     def _get_state(self):
@@ -144,21 +151,19 @@ class World(object):
         """
         Returns the reward for a given state.
         """
-        a = -10 # small negative value to discourage turnings
-        # Penalty for being able to leave the grid
-        a += -1000 if state[FRONT] == 0 else 0
-        # Penalty for being between the min value and the borders
-        a += -500 if state[RIGHT] < self._d1 else 0
-        # Penalty for being above the max value (toward the center of grid)
-        a += -50 if state[RIGHT] > self._d2 else 0
-        # Bonus for being in the correct corridor
-        a += 100 if self._d1 <= state[RIGHT] <= self._d2 else 0
-        # Penalty for having a wrong orientation
-        p = -100
-        a += p if state[RIGHT] > state[FRONT] else 0
-        a += p if state[RIGHT] > state[BACK] else 0
-        a += p if state[RIGHT] > state[LEFT] else 0
-        # Small bonus for turning at the right spot
-        a += 10 if state[FRONT] > state[BACK] else 0
+        for i in state:
+            if i < self._d1:
+                return -100
+        if state[FRONT] == 0:
+            return -100
+        a = -10
+        if state[RIGHT] == min(state):
+            a += 5
+        if self._d1 <= state[RIGHT] <= self._d2:
+            a += 15
+            if self._d1 <= state[BACK] <= self._d2:
+                a += 5
+            if self._d1 <= state[FRONT] <= self._d2:
+                a -= 15
         return a
 

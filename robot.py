@@ -66,7 +66,7 @@ class Robot(object):
             q = max(zip(d.values(), d.keys()))[0]
         else:
             # SARSA
-            q = self._Q[news][_choose_action(self._Q[news], True)]
+            q = self._Q[news][self._choose_action(self._Q[news], True)]
         qa = self._Q[olds][a]
         self._Q[olds][a] += self._alpha * (r + self._gamma * q - qa)
 #        print 'Now Q is {0}'.format(self._Q)
