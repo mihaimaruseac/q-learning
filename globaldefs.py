@@ -30,6 +30,11 @@ FORWARD = 42
 TURN_LEFT = 43
 TURN_RIGTH = 41
 
+FRONT = 0
+LEFT = 1
+BACK = 2
+RIGHT = 3
+
 IMAGES = {}
 
 def build_sep_points(maxN, maxM):

@@ -118,7 +118,7 @@ class World(object):
 
         newstate = self._get_state()
         reward = self._get_reward(newstate)
-        self._robot.receive_reward_and_state(state, newstate, reward)
+        self._robot.receive_reward_and_state(state, act, newstate, reward)
 
     def _get_state(self):
         """
@@ -128,21 +128,56 @@ class World(object):
         # assume that o = ROBOT_N (that is we are facing north)
         # compute the real distances
         state = [x, y, self._N - x - 1, self._M - y - 1]
-        print 'Real distances: {0}'.format(state)
         # trim to range
         for i in xrange(len(state)):
             if state[i] > self._D:
                 state[i] = self._D
-        print 'Trimmed distances: {0}'.format(state)
         # rotate state
         state = state[(o-1):] + state[:(o-1)]
-        state.append(o)
-        print 'State: {0}'.format(state)
+#        state.append(o)
         return tuple(state)
 
     def _get_reward(self, state):
         """
         Returns the reward for a given state.
         """
-        return -10
+        a = -10 # small negative value to discourage turnings
+
+        # Penalty for being able to leave the grid
+        p = -1000
+        if state[FRONT] == 0:
+            print 'able to leave'
+            a += p
+
+        # Penalty for being between the min value and the borders
+        p = -5000
+        if state[RIGHT] < self._d1:
+            print 'too close'
+            a += p
+
+        # Penalty for being above the max value (toward the center of grid)
+        p = -5000
+        if state[RIGHT] > self._d2:
+            print 'too far'
+            a += p
+
+        # Bonus for being in the correct corridor
+        p = 100
+        if self._d1 <= state[RIGHT] <= self._d2:
+            print 'ok'
+            a += p
+
+        # Penalty for having a wrong orientation
+        p = -100
+        if state[RIGHT] > state[FRONT]:
+            print 'turn'
+            a += p
+        if state[RIGHT] > state[FRONT]:
+            print 'turn'
+            a += p
+        if state[RIGHT] > state[FRONT]:
+            print 'turn'
+            a += p
+
+        return a
 
