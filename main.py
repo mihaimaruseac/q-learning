@@ -47,37 +47,56 @@ class MainWindow(gtk.Window):
         """
         Builds the interface of this window, the entire tree of widgets.
         """
-        self._vbox = gtk.VBox()
-        self.add(self._vbox)
+        _vbox = gtk.VBox()
+        self.add(_vbox)
 
-        self._build_toolbar()
-        self._vbox.pack_start(self._toolbar, False, False, 5)
+        _toolbar = self._build_toolbar()
+        _vbox.pack_start(_toolbar, False, False, 5)
 
     def _build_toolbar(self):
         """
         Builds the toolbar and the associated buttons used to control the
         application.
-        """
-        self._toolbar = gtk.Toolbar()
-        self._toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-        self._toolbar.set_style(gtk.TOOLBAR_BOTH)
-        self._toolbar.set_border_width(5)
 
-        self._btnNew = self._add_button_to_toolbar(gtk.STOCK_NEW, "New",
+        return  the Toolbar
+        """
+        _toolbar = gtk.Toolbar()
+        _toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        _toolbar.set_style(gtk.TOOLBAR_BOTH)
+        _toolbar.set_border_width(5)
+
+        _btnNew = self._build_toolbar_button(gtk.STOCK_NEW, "New",
                 "Starts a new simulation", self.__on_new_game)
-        self._toolbar.insert(gtk.SeparatorToolItem(), -1)
-        self._btnStep = self._add_button_to_toolbar(gtk.STOCK_GO_FORWARD,
-                "Step", "Do one step of the simulation", self.__on_step)
-        self._btnPlayPause = self._add_button_to_toolbar(gtk.STOCK_MEDIA_PLAY,
-                "Play", "Play the simulation", self.__on_play)
-        self._toolbar.insert(gtk.SeparatorToolItem(), -1)
-        self._btnAbout = self._add_button_to_toolbar(gtk.STOCK_ABOUT,
-                "About", "About this program", self.__on_about)
+        _toolbar.insert(_btnNew, -1)
+
+        _toolbar.insert(gtk.SeparatorToolItem(), -1)
+        self._build_simulation_buttons(_toolbar)
+        _toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        _btnAbout = self._build_toolbar_button(gtk.STOCK_ABOUT, "About",
+                "About this program", self.__on_about)
+        _toolbar.insert(_btnAbout, -1)
 
         self._btnStep.set_sensitive(False)
         self._btnPlayPause.set_sensitive(False)
+        return _toolbar
 
-    def _add_button_to_toolbar(self, img_stock, label, tooltip, callback):
+    def _build_simulation_buttons(self, _toolbar):
+        """
+        Builds the buttons associated with the simulation: Play/Pause,
+        Step,...
+
+        _toolbar    The toolbar where to place the buttons.
+        """
+        self._btnStep = self._build_toolbar_button(gtk.STOCK_GO_FORWARD,
+                "Step", "Do one step of the simulation", self.__on_step)
+        _toolbar.insert(self._btnStep, -1)
+
+        self._btnPlayPause = self._build_toolbar_button(gtk.STOCK_MEDIA_PLAY,
+                "Play", "Play the simulation", self.__on_play)
+        _toolbar.insert(self._btnPlayPause, -1)
+
+    def _build_toolbar_button(self, img_stock, label, tooltip, callback):
         """
         Adds a new button to a toolbar.
 
@@ -93,7 +112,6 @@ class MainWindow(gtk.Window):
         btn = gtk.ToolButton(img, label)
         btn.set_tooltip_text(tooltip)
         btn.connect('clicked', callback)
-        self._toolbar.insert(btn, -1)
         return btn
 
     def _switch_play_button_type(self):
@@ -136,9 +154,9 @@ class MainWindow(gtk.Window):
             self._switch_play_button_type()
         cfg = config.Config(self, TITLE)
         cfg.display()
-        print cfg.get_settings()
+        r = cfg.get_settings()
         cfg.destroy()
-        self._switch_playstep_buttons(True)
+        self._switch_playstep_buttons(r != None)
 
     def __step(self):
         """
@@ -150,8 +168,8 @@ class MainWindow(gtk.Window):
         has to check if the simulation is still running and return the valid
         response.
 
-        If the simulation is ended, return False after disabling the
-        simulation's buttons.
+        Since the simulation never ends, the only time we return False is when
+        the Pause button is pressed or a new simulation is started.
 
         return True if this functions should be called at a later time.
         """
@@ -161,10 +179,6 @@ class MainWindow(gtk.Window):
             return False
 #TODO: actual invocation
         print "Called"
-        if False:
-            # simulation ended, expect new start
-            self._switch_playstep_buttons(False)
-            return False
         return self._running
 
     def __on_step(self, widget, data=None):
