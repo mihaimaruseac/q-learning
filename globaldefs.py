@@ -41,5 +41,5 @@ def build_sep_points(maxN, maxM):
     """
     Builds the spliting points for a multi-screen world.
     """
-    return (xrange(0, maxN, N), xrange(0, maxM, M))
+    return (xrange(-1, maxN, N), xrange(-1, maxM, M))
 
