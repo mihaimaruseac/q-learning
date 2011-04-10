@@ -59,12 +59,16 @@ Recompensele au fost distribuite astfel:
 Mediul grafic afișează doar o parte din lume, realizându-se trecerea la partea
 următoare în momentul în care robotul ar depăși marginea ecranului.
 
+Simularea continuă realizează câte un pas la aproximativ 25ms. Pentru numărul
+maxim de pași (1000), simularea va dura 40s pe pas.
+
 3. Conținut arhivă
 ^^^^^^^^^^^^^^^^^^
 
 Arhiva conține:
 	* sursele implementării în directorul src/
 	* folder-ul test/ conținând o suită de teste:
+        * folder-ul res/ conținând resursele aplicației
 	* fișierul README: acest fișier
 
 ---
