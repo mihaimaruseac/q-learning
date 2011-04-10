@@ -11,20 +11,21 @@ TITLE = "Robot in a Grid"
 N = 12
 M = 8
 
+VOID_FILE = "img/void.png"
+EMPTY_FILE = "img/empty.png"
+ROBOT_FILE = "img/robot.png"
+ROBOT_N_FILE = "img/robot_n.png"
+ROBOT_E_FILE = "img/robot_e.png"
+ROBOT_S_FILE = "img/robot_s.png"
+ROBOT_W_FILE = "img/robot_w.png"
+
 VOID = 42
-VOID_FILE = "void.png"
 EMPTY = 43
-EMPTY_FILE = "empty.png"
 ROBOT = 0
-ROBOT_FILE = "robot.png"
 ROBOT_N = 1
-ROBOT_N_FILE = "robot_n.png"
 ROBOT_E = 2
-ROBOT_E_FILE = "robot_e.png"
 ROBOT_S = 3
-ROBOT_S_FILE = "robot_s.png"
 ROBOT_W = 4
-ROBOT_W_FILE = "robot_w.png"
 
 FORWARD = 42
 TURN_LEFT = 43

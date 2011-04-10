@@ -49,7 +49,7 @@ class MainWindow(gtk.Window):
         self.set_size_request(800, 600)
         self.set_resizable(False)
         self.set_title(TITLE)
-        self.set_icon_from_file('robot.png')
+        self.set_icon_from_file(ROBOT_FILE)
         self.connect('delete_event', self.__on_exit)
 
         self._build_world()
@@ -104,7 +104,7 @@ class MainWindow(gtk.Window):
         self._build_drawing_area(_vbox)
         self._plot_window = plot.Plot()
         self._plot_window.set_title(TITLE)
-        self._plot_window.set_icon_from_file('robot.png')
+        self._plot_window.set_icon_from_file(ROBOT_FILE)
 
     def _build_drawing_area(self, _vbox):
         """
