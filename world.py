@@ -157,14 +157,17 @@ class World(object):
                 return -100
         if state[FRONT] == 0:
             return -100
-        a = -10
-        if state[RIGHT] == min(state):
+        if min(state) > self._d2:
+            return -50
+        a = 0
+        m = min(state)
+        if state[RIGHT] == m:
             a += 5
-        if self._d1 <= state[RIGHT] <= self._d2:
-            a += 15
-            if self._d1 <= state[BACK] <= self._d2:
-                a += 5
-            if self._d1 <= state[FRONT] <= self._d2:
-                a -= 15
+        else:
+            a -= 5
+        if state[FRONT] == state[RIGHT]:
+            a += -8 if state[RIGHT] == m else 0
+        elif state[BACK] == state[RIGHT]:
+            a += -4 if state[RIGHT] == m else 0
         return a
 
