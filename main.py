@@ -315,7 +315,7 @@ class MainWindow(gtk.Window):
         self._switch_play_button_type()
         if self._running:
             self._btnStep.set_sensitive(False)
-            glib.timeout_add(250, self.__step)
+            glib.timeout_add(25, self.__step)
             self.__step()
         else:
             self._inhibit = True

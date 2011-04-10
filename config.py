@@ -59,7 +59,7 @@ class Config(object):
         _fileHBox.pack_start(_fileLabel, False, False, 5)
         self._fileChoose = gtk.FileChooserButton("Select input filename")
         _fileHBox.pack_start(self._fileChoose, True, True, 5)
-        self._rCounter = self._build_counter('Max steps:', 100, 10000, _fileHBox, 100, 0)
+        self._rCounter = self._build_counter('Max steps:', 100, 1000, _fileHBox, 100, 0)
 
     def _build_action_gui(self, _checkHBox):
         """
