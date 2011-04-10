@@ -11,13 +11,14 @@ TITLE = "Robot in a Grid"
 N = 12
 M = 8
 
-VOID_FILE = "img/void.png"
-EMPTY_FILE = "img/empty.png"
-ROBOT_FILE = "img/robot.png"
-ROBOT_N_FILE = "img/robot_n.png"
-ROBOT_E_FILE = "img/robot_e.png"
-ROBOT_S_FILE = "img/robot_s.png"
-ROBOT_W_FILE = "img/robot_w.png"
+IMG_FOLDER = 'res/'
+VOID_FILE = IMG_FOLDER + "void.png"
+EMPTY_FILE = IMG_FOLDER + "empty.png"
+ROBOT_FILE = IMG_FOLDER + "robot.png"
+ROBOT_N_FILE = IMG_FOLDER + "robot_n.png"
+ROBOT_E_FILE = IMG_FOLDER + "robot_e.png"
+ROBOT_S_FILE = IMG_FOLDER + "robot_s.png"
+ROBOT_W_FILE = IMG_FOLDER + "robot_w.png"
 
 VOID = 42
 EMPTY = 43
