@@ -9,6 +9,7 @@ PAD = 10
 R = 4
 
 import gtk
+import cPickle
 
 class Plot(gtk.Window):
     """
@@ -102,6 +103,22 @@ class Plot(gtk.Window):
         self._rcount = 0
         self._step = 0
         self._do_plot()
+
+    def save_data(self):
+        """
+        Called when plotted data should be saved. Because we are sure that all
+        indices below self._rcount are static, we will save only those values.
+
+        To do this very quickly, use pickle
+        """
+        btn = (gtk.STOCK_OK, gtk.RESPONSE_NONE,
+                gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+        d = gtk.FileChooserDialog('Select filename to save to:', self,
+                gtk.FILE_CHOOSER_ACTION_SAVE, btn)
+        if d.run() == gtk.RESPONSE_NONE:
+            filename = d.get_filename()
+            cPickle.dump(self._rewards[:self._rcount], filename)
+        d.destroy()
 
     def _build_gui(self):
         """

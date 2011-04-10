@@ -331,7 +331,7 @@ class MainWindow(gtk.Window):
         """
         Called when the user decides to save the plotted data.
         """
-        pass
+        self._plot_window.save_data()
 
     def __on_about(self, widget, data=None):
         """
