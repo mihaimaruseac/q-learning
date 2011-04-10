@@ -117,7 +117,8 @@ class Plot(gtk.Window):
                 gtk.FILE_CHOOSER_ACTION_SAVE, btn)
         if d.run() == gtk.RESPONSE_NONE:
             filename = d.get_filename()
-            cPickle.dump(self._rewards[:self._rcount], filename)
+            with open(filename, "w") as f:
+                cPickle.dump(self._rewards[:self._rcount], f)
         d.destroy()
 
     def _build_gui(self):
