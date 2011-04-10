@@ -1,0 +1,71 @@
+Mihai Maruseac, 341C3
+INVA, Tema 2
+Q-Learning (+ SARSA)
+
+1. Mod rulare
+^^^^^^^^^^^^^
+
+Se rulează direct main.py. (TODO: completat)
+
+2. Descriere generală
+^^^^^^^^^^^^^^^^^^^^^
+
+Implementarea este realizată în Python.
+
+Pentru a asigura decuplarea completă a robotului de lumea în care se află,
+acesta este implementat într-o clasă proprie (Robot din robot.py). Acolo se
+află implementați și algoritmii de învățare, bazați pe starea curentă a
+robotului.
+
+Această stare, este oferită de clasa World din world.py, singura care reține
+informații exacte despre poziția robotului, recompensele furnizate acestuia și
+numărul de iterații dintr-un episod. Practic, la finalul unul episod, robotul
+se trezește teleportat în poziția inițială și își continuă învățarea.
+
+Nu există nici o separare între etapa de învățare și etapa următoare, robotul
+funcționează neîntrerupt în stare de învățare. Algoritmii vor converge oricum,
+deci robotul va ajunge la un moment dat să se deplaseze pe coridorul cerut.
+
+Celelalte clase servesc la implementarea interfeței grafice, într-un mod cât
+mai detașat de robot cu putință. Astfel, nu este posibil ca robotul să fie
+accesat din GUI în mod direct.
+
+Pentru a obține o copie a recompenselor acumulate într-un run, se vor salva
+aceste recompense într-un format intern și se va folosi al doilea mod de
+rulare pentru a compara parametrii metodelor de învățare folosite.
+
+S-a implementat învățare Q-learning și SARSA. Pentru alegerea acțiunilor s-a
+implementat metoda ε-greedy și metoda softmax de alegere utilizând o
+distribuție Gibbs (dacă ar fi fost 2 acțiuni s-ar fi ajuns la o alegere pe
+baza unei sigmoide unde argumentul era diferența între utilitățile celor 2
+acțiuni).
+
+Se pot modifica în total 4 parametri:
+    * ε pentru ε-greedy sau τ pentru softmax
+    * α și γ pentru ambele metode de învățare
+    * numărul de pași dintr-o iterație
+
+Ca stare se consideră cele 4 distanțe. În total, sunt D^4 stări dar nu vor fi
+atinse toate decât pe hărți de dimensiuni foarte mari.
+
+Recompensele au fost distribuite astfel:
+    * -100 dacă robotul se află între coridor și marginea terenului
+    * -50 dacă robotul se află în interiorul cercului mic al coridorului
+    * o sumă formată, dacă robotul e în coridor, ca sumă din:
+        * 5 puncte dacă orientarea e potrivită, -5 altfel:
+        * -8 dacă robotul e la fel de aproape de un perete în față și în dreapta
+        * -4 dacă robotul e la fel de aproape de un perete în sptate și în stânga
+
+Mediul grafic afișează doar o parte din lume, realizându-se trecerea la partea
+următoare în momentul în care robotul ar depăși marginea ecranului.
+
+3. Conținut arhivă
+^^^^^^^^^^^^^^^^^^
+
+Arhiva conține:
+	* sursele implementării în directorul src/
+	* folder-ul test/ conținând o suită de teste:
+	* fișierul README: acest fișier
+
+---
+
