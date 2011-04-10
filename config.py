@@ -150,7 +150,7 @@ class Config(object):
             md.run()
             md.destroy()
             # Try again, hopefully we won't recourse too many times.
-            self.display()
+            return self.display()
 
         # If everything is ok here, read info from the other widgets,
         # complete the dictionary and return (the other widgets always
