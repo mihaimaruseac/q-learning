@@ -5,7 +5,24 @@ Q-Learning (+ SARSA)
 1. Mod rulare
 ^^^^^^^^^^^^^
 
-Se rulează direct main.py. (TODO: completat)
+Se rulează direct
+
+    ./ql.py
+
+pentru simulare.
+
+Pentru vizualizare comparativă se rulează fiecare simulare și se salvează
+plot-urile. Se folosește apoi
+
+    ./ql.py cmp file1 file2 ...
+
+pentru a obține un tabel cu toate rezultatele.
+
+Dacă se vrea și comparație grafică, se poate pasta tabelul în gnuplot. Pentru
+a ușura acest proces, s-a definit un script, cmp.sh care face asta, dacă este
+apelat astfel:
+
+    ./cmp.sh out_file file1 file1_title file2 file2_title ...
 
 2. Descriere generală
 ^^^^^^^^^^^^^^^^^^^^^
