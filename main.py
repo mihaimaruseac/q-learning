@@ -4,9 +4,9 @@
 # (c) Mihai Maruseac, 341C3 (2011), mihai.maruseac@rosedu.org
 #
 
-import src.main
+import src.gui
 
 if __name__ == '__main__':
-    src.main.main()
+    src.gui.main()
 
 
