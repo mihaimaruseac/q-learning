@@ -4,8 +4,51 @@
 #
 
 import random
+import math
 
 from globaldefs import *
+
+def get_cdf(l):
+    """
+    Computes the cdf of a pmf, described as [(prob, elem)].
+    """
+    s = 0
+    nl = []
+    for p in l:
+        s += p[0]
+        nl.append((s, p[1]))
+    return nl
+
+def roulette_value(pairs, select):
+    """
+    Returns a value from a list of [(cdf, value)] as given by select.
+    """
+    for p in pairs:
+        select -= p[0]
+        if select < 0:
+            return p[1]
+    return pairs[-1][1]
+
+def gibbs_choice(pairs, tau):
+    """
+    Selects a random element from a list of pairs (prob, elem) using a Gibbs
+    distribution.
+
+    More exactly, selects element (p, x) (thus returning x) with probability
+    exp(p/τ)/sum(exp(p_i/τ)), where τ = tau
+    """
+    # divide each p by τ
+    divs = map(lambda x: (math.exp(x[0]/tau), x[1]), pairs)
+    # get the entire sum
+    psum = sum(map(lambda x: x[0], divs))
+    # get the probabilities (pmf)
+    pmf = map(lambda x: (x[0]/psum, x[1]), divs)
+    # get the cdf
+    cdf = get_cdf(pmf)
+    # get a random variable in [0, 1) used to select from the cdf (roulette)
+    roulette = random.uniform(0, 1)
+    # return the selected value
+    return roulette_value(cdf, roulette)
 
 class Robot(object):
     """
@@ -88,6 +131,10 @@ class Robot(object):
                 a = max(zip(actions.values(), actions.keys()))[1]
             else:
                 a = random.choice(actions.keys())
+        else:
+            # softmax selection
+            pairs = zip(actions.values(), actions.keys())
+            a = gibbs_choice(pairs, self._eps_or_tau)
         if future:
             self.__a__ = a
         elif self.__a__:
