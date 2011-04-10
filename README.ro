@@ -83,7 +83,7 @@ maxim de pași (1000), simularea va dura 40s pe pas.
 ^^^^^^^^^^^^^^^^^^
 
 Arhiva conține:
-	* sursele implementării în directorul src/
+	* sursele implementării în directorul src/ și în directorul părinte
 	* folder-ul test/ conținând o suită de teste:
         * folder-ul res/ conținând resursele aplicației
 	* fișierul README: acest fișier
