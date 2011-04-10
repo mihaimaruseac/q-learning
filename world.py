@@ -99,6 +99,7 @@ class World(object):
             # reset state
             self._crun = 0
             self._xr, self._yr, self._ror = self._xs, self._ys, self._oror
+            _reward = self._rec
             self._rec = 0
 
         state = self._get_state()
@@ -127,7 +128,9 @@ class World(object):
         reward = self._get_reward(newstate)
         self._rec += reward
         self._robot.receive_reward_and_state(state, act, newstate, reward)
-        return (self._crun == 0, self._rec)
+        if self._crun:
+            return (False, self._rec)
+        return (True, _reward)
 
     def _get_state(self):
         """
