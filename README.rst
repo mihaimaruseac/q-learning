@@ -52,6 +52,7 @@ At each position, the robot must choose between going forward or turning left
 or right. Each selection is based on the rewards given until that point.
 
 The rewards are given like this:
+
 * -100 if closer than d1 or facing the exterior of the grid
 * -50 if farther than d2
 * a value between -15 and 5 depending on the desired orientation
